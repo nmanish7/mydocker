@@ -1,0 +1,62 @@
+FROM ubuntu:latest
+ENV HOME /home/anonymous
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN groupadd -r anonymous && \
+    useradd -ms /bin/bash -r -g anonymous anonymous
+
+RUN apt-get update && \
+    apt-get install -y \
+    wget \
+    xz-utils \
+    zenity \
+    libdbus-glib-1-2
+
+RUN cd /opt && \
+    mkdir torbrowser
+
+RUN cd /opt/torbrowser && \
+    wget https://dist.torproject.org/torbrowser/11.0.10/tor-browser-linux64-11.0.10_en-US.tar.xz
+
+RUN cd /opt/torbrowser/ && \
+    tar --strip 1 -xf ./tor-* && \
+    rm -rf *.tar.xz
+
+
+RUN chown anonymous:anonymous /opt/torbrowser -R
+
+RUN ln -s /opt/torbrowser/Browser/start-tor-browser /usr/bin/start-tor-browser
+
+RUN chsh -s /usr/sbin/nologin root
+USER anonymous
+WORKDIR /home/anonymous
+CMD ["start-tor-browser"]
+
+
+# xhost +
+
+# Commands Usage:
+
+# docker build . -t nmanish/tor:0.1
+# or
+# docker pull nmanish/
+
+## Persistent Data with Local Directory Mapping:
+# mkdir anonymous; sudo docker run -u anonymous -it --security-opt=no-new-privileges --name tor1 -v `pwd`/anonymous:/home/anonymous -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY nmanish/tor:0.1
+# sudo docker start <CONTAINER_ID>
+
+## Persistent:
+# mkdir anonymous; sudo docker run -u anonymous -it --security-opt=no-new-privileges --name tor1 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY nmanish/tor:0.1
+# sudo docker start <CONTAINER_ID>
+
+## Temporary Surfing:
+# sudo docker run -u anonymous -it --security-opt=no-new-privileges --rm -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY nmanish/tor:0.1
+
+# Root Terminal 
+# sudo docker run -u root -it --security-opt=no-new-privileges -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY nmanish/tor:0.1 /bin/bash
+
+
+# Browse to Check Tor Node: https://check.torproject.org/
+# Test Link:
+# http://6nhmgdpnyoljh5uzr5kwlatx2u3diou4ldeommfxjz3wkhalzgjqxzqd.onion/
+# http://2jwcnprqbugvyi6ok2h2h7u26qc6j5wxm7feh3znlh2qu3h6hjld4kyd.onion/

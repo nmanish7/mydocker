@@ -1,0 +1,65 @@
+#!/usr/bin/env sh
+
+
+## Quit if anything goes wrong
+set -e
+
+
+## Location to use: /usr/share/example (default to /)
+location="${1-/}"
+## Package name: example
+package="$2"
+## Depth: 0-9 (default to 1)
+depth="${3:-1}"
+## List only folders: true/false (default to true)
+folders="${4:-true}"
+
+
+## Package description ~ $ awk -F ': ' '/^Description: / {print $2}' ./example/debian/control
+[ ! -z "${package}" ] \
+  && description="$( dpkg-query -f'${binary:Synopsis}\n' -W ${package} 2>/dev/null )"
+
+
+## Feedback - banner
+[ ! -z "${description}" ] \
+  && echo "> ${package} ~ ${description}"
+
+
+## Move to location
+cd "${location}"
+
+
+## List output
+if [ "$( which tree )" ]; then
+  ## Check to see if folders only
+  [ "${folders}" = "true" ] \
+    && folder="-d" \
+    || folder=""
+
+  ## Using tree - display output
+  tree ${folder} -L ${depth} --noreport "${location}"
+else
+  ## Feedback - location
+  echo "${location}"
+
+  ## Check to see if folders only
+  [ "${folders}" = "true" ] \
+    && folder="-type d" \
+    || folder=""
+
+  ## Using find/sed - display output
+  find "${location}" -maxdepth ${depth} -mindepth 1 ${folder} \
+    | sort \
+    | sed -e 's/[^-][^\/]*\//-/g; s/^/  /; s/-/|/'
+fi
+
+
+## Check to see if last location is where we want to end up
+## If its not, spawn a new shell (sub shell), so to "move" with "cd"
+## This isn't ideal, but best option for the time being (rather keep everything in parent shell)
+if [ "${OLDPWD}" != "${location}" ]; then
+  ## From kali-menu: exec-in-shell
+  USER=${USER:-$(whoami)}
+  SHELL=${SHELL:-$(getent passwd $USER|cut -d: -f7)}
+  ${SHELL:-bash} -i
+fi

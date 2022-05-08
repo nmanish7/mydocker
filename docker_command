@@ -1,0 +1,80 @@
+# sudo docker --help
+# sudo docker pull ubuntu
+# sudo docker images
+
+# sudo docker rmi ubuntu
+
+# sudo docker run --name ubuntu -it ubuntu /bin/bash
+# sudo docker run -i -t --net=host -e DISPLAY -v /tmp/.X11-unix ubuntu bash
+# sudo docker run --name myubuntu -it --net=host -e DISPLAY -v /tmp/.X11-unix ubuntu bash
+
+# sudo docker create hello-world
+# sudo docker start -a 6c5
+# sudo docker ps -a
+# sudo docker logs d33
+# sudo docker kill d33
+# sudo docker start e60
+# sudo docker stop e60
+# sudo docker attach e60
+# sudo docker exec ubuntu xauth list
+
+# sudo docker create --name box1 -i -t busybox sh
+# sudo docker start 8fa
+# sudo docker exec -i -t 8fa93c3f8255 sh
+# sudo docker start -a 8fa
+
+# sudo docker container ls -s
+# sudo docker network ls
+# sudo docker inspect e60
+
+# sudo docker rm e60
+# sudo docker ps --filter status=exited  -q | sudo xargs docker rm
+
+# apt update && apt full-upgrade -y && apt install curl wget vim xauth firefox git iputils-ping iproute2 net-tools openjdk-11-jdk -y
+# Host Machine: # xauth list
+# xauth add teamer/unix:0  MIT-MAGIC-COOKIE-1  f7aea4c9fec2b2eff49a73230f6d6d3d
+
+## Docker File to Image:
+
+## How to create a custom image?
+
+- Choose a Base Image (Ubuntu)
+- Run Command for Our Applications.
+- Specify the base command to be run at startup.
+
+# sudo docker build .
+
+## Tagging Images:
+# sudo docker build -t manish/ubuntu:latest .
+
+- manish : docker username
+- ubuntu : image name
+
+# sudo docker run manish/ubuntu
+
+## Taking Current FileSystem Startup and Commit them so it's start from the currnet stage next time:
+
+# sudo docker commit -c 'CMD "redis-server"' <Container ID>
+# sudo docker commit  ec18ae6d200f nmanish/ubuntu:version2
+# sudo docker tag nmanish/ubuntu:version2 nmanish/ubuntu
+
+
+
+# sudo docker run -u burp -i -t --net=host -e DISPLAY -v /tmp/.X11-unix nmanish/burpsuite:beta2 burpsuite
+
+*Running Tactics:*
+
+# sudo docker pull nmanish/burpsuite
+# sudo docker create -u burp -i -t --net=host -e DISPLAY -v /tmp/.X11-unix nmanish/burpsuite
+# sudo docker ps --all
+# sudo docker start 1492a6676f4e
+# sudo docker exec 1492a6676f4e xauth remove teamer/unix:0
+# xauth list | xargs sudo docker exec 1492a6676f4e xauth add
+# sudo docker exec 1492a6676f4e burpsuite &> /dev/null &
+# docker run -it --rm --privileged
+# docker run -u anonymous -it --rm --security-opt=no-new-privileges <docker-image-id> /bin/bash
+
+
+sudo docker run -u root --cap-drop=ALL --cap-add=SYS_ADMIN -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY nmanish/burpsuite:0.3 /bin/bash
+
+sudo docker run -u root --cap-drop=ALL --cap-add=SYS_ADMIN -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY nmanish/burpsuite:0.3 /bin/bash
