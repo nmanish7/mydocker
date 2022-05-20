@@ -1,0 +1,93 @@
+version: "2.2"
+
+services:
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    
+    user: "0"
+    command: >
+      bash -c '
+        if [ x${ELASTIC_PASSWORD} == x ]; then
+          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
+          exit 1;
+        elif [ x${KIBANA_PASSWORD} == x ]; then
+          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+          exit 1;
+        fi;
+      '
+
+  es01:
+   
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+ 
+    ports:
+      - ${ES_PORT}:9200
+    environment:
+      - node.name=es01
+      - cluster.name=${CLUSTER_NAME}
+      - cluster.initial_master_nodes=es01
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - xpack.license.self_generated.type=${LICENSE}
+    mem_limit: ${MEM_LIMIT}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+    
+  kibana:
+  
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      
+    mem_limit: ${MEM_LIMIT}
+
+
+  curl_create:
+    image: curlimages/curl
+    command: 
+    - sh
+    - -c
+    - |
+      #!/usr/bin/env bash -e
+      sleep 60
+      curl -XPUT "es01:9200/twinttweets?pretty" -H 'Content-Type: application/json' -d ' { "settings": { "analysis": { "normalizer": { "hashtag_normalizer": { "filter": [ "lowercase", "asciifolding" ], "type": "custom", "char_filter": [] } } } } }'
+
+      curl -XPUT "es01:9200/twinttweets/_mapping?pretty" -H 'Content-Type: application/json' -d' { "dynamic": false, "properties": { "cashtags": { "type": "keyword", "normalizer": "hashtag_normalizer" }, "conversation_id": { "type": "long" }, "created_at": { "type": "text" }, "date": { "type": "date", "format": "yyyy-MM-dd HH:mm:ss" }, "day": { "type": "integer" }, "essid": { "type": "keyword" }, "geo_near": { "type": "geo_point" }, "geo_tweet": { "type": "geo_point" }, "hashtags": { "type": "keyword", "normalizer": "hashtag_normalizer" }, "hour": { "type": "integer" }, "id": { "type": "long" }, "lang": { "type": "keyword" }, "language": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } }, "link": { "type": "text" }, "location": { "type": "keyword" }, "mentions": { "type": "nested", "properties": { "id": { "type": "long" }, "name": { "type": "text" }, "screen_name": { "type": "text" } } }, "name": { "type": "text" }, "near": { "type": "text" }, "nlikes": { "type": "integer" }, "nreplies": { "type": "integer" }, "nretweets": { "type": "integer" }, "photos": { "type": "text" }, "profile_image_url": { "type": "text" }, "quote_url": { "type": "text" }, "reply_to": { "type": "nested", "properties": { "id": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } }, "name": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } }, "screen_name": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } }, "user_id": { "type": "keyword" }, "username": { "type": "keyword" } } }, "retweet": { "type": "text" }, "retweet_date": { "type": "date", "format": "yyyy-MM-dd HH:mm:ss", "ignore_malformed": true }, "retweet_id": { "type": "keyword" }, "search": { "type": "text" }, "source": { "type": "keyword" }, "thumbnail": { "type": "text" }, "timezone": { "type": "keyword" }, "trans_dest": { "type": "keyword" }, "trans_src": { "type": "keyword" }, "translate": { "type": "text" }, "tweet": { "type": "text" }, "urls": { "type": "keyword" }, "user_id_str": { "type": "keyword" }, "user_rt": { "type": "keyword" }, "user_rt_id": { "type": "keyword" }, "username": { "type": "keyword", "normalizer": "hashtag_normalizer" }, "video": { "type": "integer" } } }'
+   
+  curl_delete_create:
+    image: curlimages/curl
+    command: 
+    - sh
+    - -c
+    - |
+      #!/usr/bin/env bash -e
+      sleep 60
+      curl -XDELETE "es01:9200/twinttweets?pretty" -H 'Content-Type: application/json'
+
+      curl -XPUT "es01:9200/twinttweets?pretty" -H 'Content-Type: application/json' -d ' { "settings": { "analysis": { "normalizer": { "hashtag_normalizer": { "filter": [ "lowercase", "asciifolding" ], "type": "custom", "char_filter": [] } } } } }'
+
+      curl -XPUT "es01:9200/twinttweets/_mapping?pretty" -H 'Content-Type: application/json' -d' { "dynamic": false, "properties": { "cashtags": { "type": "keyword", "normalizer": "hashtag_normalizer" }, "conversation_id": { "type": "long" }, "created_at": { "type": "text" }, "date": { "type": "date", "format": "yyyy-MM-dd HH:mm:ss" }, "day": { "type": "integer" }, "essid": { "type": "keyword" }, "geo_near": { "type": "geo_point" }, "geo_tweet": { "type": "geo_point" }, "hashtags": { "type": "keyword", "normalizer": "hashtag_normalizer" }, "hour": { "type": "integer" }, "id": { "type": "long" }, "lang": { "type": "keyword" }, "language": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } }, "link": { "type": "text" }, "location": { "type": "keyword" }, "mentions": { "type": "nested", "properties": { "id": { "type": "long" }, "name": { "type": "text" }, "screen_name": { "type": "text" } } }, "name": { "type": "text" }, "near": { "type": "text" }, "nlikes": { "type": "integer" }, "nreplies": { "type": "integer" }, "nretweets": { "type": "integer" }, "photos": { "type": "text" }, "profile_image_url": { "type": "text" }, "quote_url": { "type": "text" }, "reply_to": { "type": "nested", "properties": { "id": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } }, "name": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } }, "screen_name": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } }, "user_id": { "type": "keyword" }, "username": { "type": "keyword" } } }, "retweet": { "type": "text" }, "retweet_date": { "type": "date", "format": "yyyy-MM-dd HH:mm:ss", "ignore_malformed": true }, "retweet_id": { "type": "keyword" }, "search": { "type": "text" }, "source": { "type": "keyword" }, "thumbnail": { "type": "text" }, "timezone": { "type": "keyword" }, "trans_dest": { "type": "keyword" }, "trans_src": { "type": "keyword" }, "translate": { "type": "text" }, "tweet": { "type": "text" }, "urls": { "type": "keyword" }, "user_id_str": { "type": "keyword" }, "user_rt": { "type": "keyword" }, "user_rt_id": { "type": "keyword" }, "username": { "type": "keyword", "normalizer": "hashtag_normalizer" }, "video": { "type": "integer" } } }'
+   
+
+  twint_terminal:
+
+    image: nmanish/twint:0.2
+      
+
+# Usage:
+# docker-compose up es01 kibana curl_create
+# docker-compose up es01 kibana curl_delete_create
+
+# docker-compose run --rm twint_terminal
+# twint -s pizza --limit 100 --elasticsearch http://es01:9200 
