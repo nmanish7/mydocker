@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  ssh_server:
+    restart: always
+    image: nmanish/ssh:latest
+    ports:
+      - "2222:22"
+    networks:
+      - ssh_network
+
+    container_name: fake_ssh
+    hostname: team.ancs.com
+    stdin_open: true
+    tty: true
+    command: >
+      sh -c "/etc/init.d/ssh start &&
+            /bin/bash"
+
+networks:
+  ssh_network:
+    driver: bridge
+    name: segerated
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+          gateway: 10.0.0.1
+# docker network create --driver=bridge --subnet=10.0.0.0/24 segerated
+# docker run --network segerated  -itd nmanish/ssh:latest /bin/bash  -c  '/etc/init.d/ssh start && /bin/bash '
+
+# To Run:
+# docker-compose up -d

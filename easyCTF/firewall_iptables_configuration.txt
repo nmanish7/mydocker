@@ -1,0 +1,52 @@
+ Default Policy:
+
+iptables --table filter --policy INPUT DROP 
+iptables --table filter --policy OUTPUT DROP 
+
+
+
+# Loopback Address:
+
+iptables --table filter --append INPUT  --in-interface lo --jump ACCEPT 
+iptables --table filter --append OUTPUT --out-interface lo --jump ACCEPT 
+
+
+
+# For ESTABLISHED and RELATED
+
+iptables -A INPUT --in-interface enp0s3 -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT --out-interface enp0s3 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+
+# For SSH
+iptables --table filter --append INPUT --protocol tcp --dport 22 --source 0/0 --jump ACCEPT
+
+
+# For DHCP
+
+iptables --table filter --append OUTPUT --out-interface enp0s3 --protocol udp --dport 67:68 --sport 67:68 ACCEPT 
+
+
+# For Web:
+
+iptables --table filter --append INPUT --protocol tcp --dport 80 --source 0/0 --jump ACCEPT
+iptables --table filter --append INPUT --protocol tcp --dport 4455 --source 0/0 --jump ACCEPT 
+iptables --table filter --append INPUT --protocol tcp --dport 5802 --source 0/0 --jump ACCEPT
+
+
+# ICMP Echo request Allowed:
+
+iptables -t filter -A OUTPUT -p icmp --icmp-type echo-request -j ACCEPT
+
+
+# DNS:
+
+iptables --table filter --append OUTPUT --out-interface enp0s3 --protocol udp --dport 53 --jump ACCEPT 
+
+
+# FTP:
+
+iptables --table filter --append INPUT --protocol tcp --dport 21 --jump ACCEPT
+iptables --table filter --append OUTPUT --protocol tcp --sport 20 --jump ACCEPT
+
+ 

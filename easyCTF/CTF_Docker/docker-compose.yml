@@ -1,0 +1,11 @@
+version: "3"
+services:
+  easyctf:
+    restart: always
+    image: nmanish/easyctf:latest
+    ports:
+      - "5802:80"
+
+    container_name: team
+    hostname: team.bwu.com
+# docker run -d --name "team1" -h team1.bwu.com  --rm  -p 172.31.11.251:5802:80  nmanish/easyctf

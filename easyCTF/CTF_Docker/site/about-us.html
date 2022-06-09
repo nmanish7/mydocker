@@ -1,0 +1,157 @@
+<div class="hacking-animation">
+    <pre class="hacking-animation__text">
+      </pre>
+  </div>
+
+<style>
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .hacking-animation {
+        background: #ffffff;
+        color: #eee;
+        height: 100%;
+        
+        
+        &__text {
+            bottom: 0;
+            font-family: "Share Tech Mono", monospace;
+            color: #eee;
+            font-size: 18px;
+            left: 0;
+            line-height: 1.5rem;
+            padding: 2rem;
+            position: absolute;
+            right: 0;
+            }
+
+        &__character {
+            animation: type 1s linear;
+            color: #45aae7;
+        }
+    }
+
+@keyframes type {
+    0% {
+        background: #fff;
+        color: #eee;
+    }
+    
+    5% {
+        background: transparent;
+        color: #fff;
+    }
+
+    100% {
+    background: transparent;
+    color: #45aae7;
+}
+}
+
+</style>
+
+<script>
+
+    $(document).ready(function () {
+        const textArray = textString.split("");
+        const textElem = $(".hacking-animation__text");
+        
+        let count = 0;
+        
+        var myInterval = setInterval(() => {
+            if (textArray[count] === "\n") {
+                textElem.append("<br>");
+            } else {
+                textElem.append(
+                    `<span class="hacking-animation__character">${textArray[count]}</span>`
+                    );
+                }
+                
+                count++;
+                if (count === textArray.length) {
+                    clearInterval(myInterval);
+
+                }
+            }, 20);
+
+        });
+        
+        var textString = `.
+        .
+        /// A N I S H ///
+        <project ENDLESS>:::CTF9876
+            We are the Hacker of Society 991
+            ...Connecting server M.A.R.S....
+            ...
+            ...
+            //infected corona\\\\
+            ://project COVID-19...
+            (**ACCESS GRANTED**)....
+            message for earthling="I'm member of elite society! And you're earthworm! HaHa LOOSE YOU! Im ANISH" ....
+            ....
+            ...
+            ..
+        .
+        //COVID-22 PRE-PLAN Attack...
+        
+        {AYA}/// -- \\\\SUPREME LEADER\\\\
+        <M> Connecting CTF Player..:":":":
+            ff
+            
+            <Earth God...>
+                /connection players...
+                
+                C.T.F Teams
+                Central Operating System 
+                highly advanced digital information 
+                system designed to manage the infrastructure 
+                           of city
+                  -----I´m your future----
+                  aya@ipSec;
+                  
+                  .
+                  .
+                  .
+                  START;;'DECRYPTION;;'PASSWORD
+                  LOAD...
+                  ...
+                  ...
+                  ...
+                  ...
+                  ..
+                  .
+                  $%$%$qazWSXedcRFVtgbYHNujmIKol$%$%$%
+                  \\\\...SERVER ACCEPTED your CALL...
+                  \\\\%^^attach{INDIA}"'';
+                  
+                  ///
+                  //
+                  
+                  /
+                  //
+                  ////BRAINWARE SELECTED...&*&&*&;
+                  [sd]
+                  {message}
+                   
+                  msg : Attack the system...
+                  Get control and stop the "brainwarectf" user...
+                  He's planned for COVID-22...
+                  STOP him... by taking control of system..
+             
+   ///(CONNECTION BREAK)
+   {AYA USER DELETED}
+   aya killed by anish...
+   Future is Dark.
+   D.E.P.E.N.D on Y.O.U.T.H VERSION 0.0
+   ...
+   .....
+   ...
+   ....
+   ...`;
+   
+</script>

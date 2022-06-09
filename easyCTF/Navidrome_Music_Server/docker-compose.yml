@@ -1,0 +1,13 @@
+version: "3"
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    user: 1000:1000
+    ports:
+      - "4455:4533"
+    environment:
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info
+    volumes:
+      - "/home/song/data:/data"
+      - "/home/song/music:/music:ro"
